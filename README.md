@@ -137,3 +137,17 @@ module.exports = {
 https://blog.logrocket.com/how-to-build-a-server-rendered-react-app-with-next-express-d5a389e7ab2f/
 https://github.com/zeit/next.js/tree/canary/examples/custom-server-express
 https://github.com/mluberry/nextjs-express
+
+
+
+
+## Referances:
+https://serverless-stack.com/#table-of-contents 
+https://jasonwatmore.com/post/2017/09/16/react-redux-user-registration-and-login-tutorial-example
+https://auth0.com/blog/next-js-authentication-tutorial/
+
+https://dev.to/jolvera/user-authentication-with-nextjs-4023
+https://levelup.gitconnected.com/secure-nextjs-app-users-with-auth0-and-typescript-3b0a6ac3a163 
+
+E-Commerce App : https://www.youtube.com/watch?v=wPQ1-33teR4&t=5449s
+Redux: https://www.youtube.com/watch?v=CVpUuw9XSjY&t=1918s
