@@ -1,7 +1,7 @@
 import db from '../dbConfig/dbConnection';
 import { isEmailId } from '../helper/validation';
 import { v4 as uuidv4 } from 'uuid';
-import { createDataJson,getInsertParamString } from '../dbConfig/dbSchema';
+import { createDataJson,getUpdateParamString } from '../dbConfig/dbSchema';
 import { checkUserByMail, checkUserByMob } from './createUser';
 
 export const createSupplier = (UD) => new Promise((resolve, reject) => {
@@ -16,6 +16,7 @@ export const createSupplier = (UD) => new Promise((resolve, reject) => {
 			}
 			else if(rslt && rslt.userid && !rslt.issupplier){
 				UD.isExistingUser = true;
+				UD.userid = rslt.userid;
 				createFreshSupplier(UD).then((rslt1)=>{
 					resolve(rslt1);
 				})
@@ -28,6 +29,7 @@ export const createSupplier = (UD) => new Promise((resolve, reject) => {
 		})
   }
   else{
+		console.log(1)
     resolve(false)
   }
 })
@@ -84,7 +86,11 @@ const createFreshSupplier = (UD) => new Promise((resolve, reject) => {
 	if (UD.email || UD.phone) {
 			db.tx(async t => {
 				const nanoid = require('../libs/genid/generate');
-				UD.userid = (result && result.userid) ? result.userid : uuidv4();
+
+				if(!UD.isExistingUser){
+					UD.userid = uuidv4();
+				}
+
 				UD.billingid = nanoid('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12);
 				UD.companyname = UD.companyname ? UD.companyname : '';
 				UD.contacttitle = UD.contacttitle ? UD.contacttitle : ''
@@ -107,19 +113,21 @@ const createFreshSupplier = (UD) => new Promise((resolve, reject) => {
 				UD.email = isEmailId(UD.email) ? UD.email : ''
 				UD.website = UD.website ? UD.website : ''
 				UD.logo = UD.logo ? UD.logo : ''
-				UD.registrationtime = new Date().getTime();
+				UD.ranking = 0
+				UD.registrationtime = new Date();
 				UD.verificationcode = nanoid('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
+				UD.extranote = UD.extranote?UD.extranote:'';
 				UD.userip = UD.userip ? UD.userip : ''
 
-				await t.any('INSERT INTO supplier VALUES(${userid}, ${billingid}, &{companyname} \
+				await t.any('INSERT INTO supplier VALUES(${userid}, ${billingid}, ${companyname}, \
 									${contacttitle}, ${contactname}, ${address1}, ${address2}, \
-									${city}, ${state}, ${postalcode}, ${country}, ${iso2}, \
-									${phone}, ${email}, ${website}, ${logo}, \
-									${registrationtime}, ${verificationcode}, ${userip})', UD);
+									${city}, ${state}, ${country}, ${postalcode}, ${iso2}, \
+									${phone}, ${email}, ${website}, ${logo}, ${ranking}, \
+									${registrationtime}, ${verificationcode}, ${extranote}, ${userip})', UD);
 
 				UD.issupplier = true;
 
-				if(UD.isExistingUser){					
+				if(UD.isExistingUser){
 					if (isEmailId(UD.email)) {
 						await t.none('UPDATE usersbymail SET issupplier = ${issupplier} WHERE email = ${email}', UD);
 					}
@@ -142,10 +150,10 @@ const createFreshSupplier = (UD) => new Promise((resolve, reject) => {
 					}
 				}
 			}).then(() => {
-				UD.userCreated = true;
+				UD.supplierCreated = true;
 				resolve (UD)
-			}).catch(error => {
-				resolve ({ userCreated: false });
+			}).catch(err => {
+				resolve ({ supplierCreated: false, err:err});
 			});
 	}
 })
@@ -180,7 +188,7 @@ export const updateSupplierInfo = (UD) => new Promise((resolve,reject)=>{
 })
 
 
-export const updateSupplierData = (UD) => new Promise((resolve,reject)=>{
+const updateSupplierData = (UD) => new Promise((resolve,reject)=>{
 	if (UD.userid) {
 		db.tx(async t => {
 			let data = createDataJson('supplier', UD)
@@ -189,15 +197,14 @@ export const updateSupplierData = (UD) => new Promise((resolve,reject)=>{
 				resolve(false);
 			}
 
-			let fields = getInsertParamString('supplier', data, 'userid');
-
-			await t.any('INSERT INTO supplier VALUES(' + fields + ')', UD);
+			let fields = getUpdateParamString('supplier', data, 'userid');
+			await t.none('UPDATE supplier SET ' + fields + 'WHERE userid = ${userid}', UD);
 
 		}).then(() => {
-			UD.userCreated = true;
+			UD.supplierUpdated = true;
 			resolve(UD)
-		}).catch(error => {
-			resolve ({ userCreated: false });
+		}).catch(err => {
+			resolve ({ supplierUpdated: false, err:err });
 		});
 	}
 	else {
