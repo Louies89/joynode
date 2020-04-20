@@ -149,5 +149,14 @@ https://auth0.com/blog/next-js-authentication-tutorial/
 https://dev.to/jolvera/user-authentication-with-nextjs-4023
 https://levelup.gitconnected.com/secure-nextjs-app-users-with-auth0-and-typescript-3b0a6ac3a163 
 
+A curated list of awesome resources : books, videos, articles about using Next.js (A minimalistic framework for universal server-rendered React applications
+https://github.com/unicodeveloper/awesome-nextjs
+
+A comprehensive Nextjs project template
+https://github.com/stanleyfok/nextjs-template
+
+NextJs Page Rendering:
+https://nextjs.org/docs/basic-features/pages
+
 E-Commerce App : https://www.youtube.com/watch?v=wPQ1-33teR4&t=5449s
 Redux: https://www.youtube.com/watch?v=CVpUuw9XSjY&t=1918s
